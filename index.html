@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Большая Клавиатура</title>
+    <title>Большая Клавиатура (Только буквы)</title>
     <style>
         * {
             box-sizing: border-box;
@@ -17,13 +17,14 @@
             flex-direction: column;
             height: 100vh; /* На весь экран */
             background-color: #f0f0f0;
+            overflow: hidden; /* Блокируем прокрутку страницы */
         }
 
         /* Поле вывода текста */
         #output {
-            flex: 1; /* Занимает всё место, не занятое клавиатурой */
+            height: 25vh; /* Занимает 25% высоты экрана */
             width: 100%;
-            font-size: 40px; /* Очень крупный шрифт */
+            font-size: 45px; /* Очень крупный шрифт введенного текста */
             padding: 20px;
             border: none;
             resize: none;
@@ -38,18 +39,18 @@
 
         /* Контейнер клавиатуры */
         .keyboard {
-            height: 60vh; /* Клавиатура занимает 60% высоты экрана */
+            height: 75vh; /* Клавиатура занимает 75% высоты экрана */
             display: flex;
             flex-direction: column;
             background-color: #333;
-            padding: 10px;
+            padding: 8px;
         }
 
         .row {
             display: flex;
             flex: 1; /* Ряды растягиваются равномерно */
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .row:last-child {
@@ -58,16 +59,19 @@
 
         /* Кнопки */
         button {
-            flex: 1; /* Кнопки растягиваются равномерно */
-            font-size: 32px; /* Размер букв на кнопках */
-            font-weight: bold;
+            flex: 1; /* Кнопки растягиваются равномерно по ширине */
+            font-size: 55px; /* ОЧЕНЬ большие буквы */
+            font-weight: 900; /* Максимальная жирность */
             background-color: #fff;
-            border: 2px solid #000;
-            border-radius: 8px;
+            border: 3px solid #000;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background 0.1s;
             color: #000;
-            touch-action: manipulation; /* Улучшает реакцию на тачскрин */
+            padding: 0;
+            touch-action: manipulation;
+            display: flex; /* Центрирование текста */
+            align-items: center;
+            justify-content: center;
         }
 
         button:active {
@@ -76,34 +80,36 @@
 
         /* Специальные кнопки */
         .btn-wide {
-            flex: 2; /* Пробел и Backspace шире */
-            background-color: #ffdddd; /* Слегка красноватый для Backspace */
+            flex: 1.5; 
+            background-color: #ffdddd; 
+            font-size: 40px; /* Чуть меньше для спецсимволов */
         }
 
         .btn-space {
-            flex: 4; /* Пробел самый широкий */
+            flex: 4; 
+            font-size: 30px;
         }
         
         .btn-enter {
-            background-color: #ddffdd; /* Зеленоватый для Enter */
+            flex: 1.5;
+            background-color: #ddffdd;
         }
 
     </style>
 </head>
 <body>
 
-    <textarea id="output" placeholder="Нажмите на кнопки, чтобы печатать..." autofocus></textarea>
+    <textarea id="output" placeholder="..." autofocus></textarea>
 
     <div class="keyboard" id="keyboard-container">
-        </div>
+    </div>
 
     <script>
         const output = document.getElementById('output');
         const keyboardContainer = document.getElementById('keyboard-container');
 
-        // Раскладка клавиатуры (русская)
+        // Раскладка БЕЗ ЦИФР
         const layout = [
-            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
             ['Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З', 'Х', 'Ъ'],
             ['Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж', 'Э'],
             ['Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', '.', ','],
@@ -118,13 +124,12 @@
             rowKeys.forEach(key => {
                 const btn = document.createElement('button');
                 
-                // Настройка текста и классов для спецкнопок
                 if (key === 'SPACE') {
                     btn.textContent = 'ПРОБЕЛ';
                     btn.classList.add('btn-space');
                     btn.onclick = () => addChar(' ');
                 } else if (key === 'BACKSPACE') {
-                    btn.textContent = '⌫'; // Значок стирания
+                    btn.textContent = '⌫'; 
                     btn.classList.add('btn-wide');
                     btn.onclick = () => deleteChar();
                 } else if (key === 'ENTER') {
@@ -142,12 +147,9 @@
             keyboardContainer.appendChild(rowDiv);
         });
 
-        // Логика печати
         function addChar(char) {
             output.value += char;
-            // Автопрокрутка вниз при печати
             output.scrollTop = output.scrollHeight;
-            // Возврат фокуса в поле (чтобы курсор мигал)
             output.focus();
         }
 
