@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Большая Клавиатура</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* На весь экран */
+            background-color: #f0f0f0;
+        }
+
+        /* Поле вывода текста */
+        #output {
+            flex: 1; /* Занимает всё место, не занятое клавиатурой */
+            width: 100%;
+            font-size: 40px; /* Очень крупный шрифт */
+            padding: 20px;
+            border: none;
+            resize: none;
+            background-color: #ffffff;
+            color: #000000;
+            border-bottom: 5px solid #333;
+        }
+
+        #output:focus {
+            outline: none;
+        }
+
+        /* Контейнер клавиатуры */
+        .keyboard {
+            height: 60vh; /* Клавиатура занимает 60% высоты экрана */
+            display: flex;
+            flex-direction: column;
+            background-color: #333;
+            padding: 10px;
+        }
+
+        .row {
+            display: flex;
+            flex: 1; /* Ряды растягиваются равномерно */
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .row:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Кнопки */
+        button {
+            flex: 1; /* Кнопки растягиваются равномерно */
+            font-size: 32px; /* Размер букв на кнопках */
+            font-weight: bold;
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.1s;
+            color: #000;
+            touch-action: manipulation; /* Улучшает реакцию на тачскрин */
+        }
+
+        button:active {
+            background-color: #ccc;
+        }
+
+        /* Специальные кнопки */
+        .btn-wide {
+            flex: 2; /* Пробел и Backspace шире */
+            background-color: #ffdddd; /* Слегка красноватый для Backspace */
+        }
+
+        .btn-space {
+            flex: 4; /* Пробел самый широкий */
+        }
+        
+        .btn-enter {
+            background-color: #ddffdd; /* Зеленоватый для Enter */
+        }
+
+    </style>
+</head>
+<body>
+
+    <textarea id="output" placeholder="Нажмите на кнопки, чтобы печатать..." autofocus></textarea>
+
+    <div class="keyboard" id="keyboard-container">
+        </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const keyboardContainer = document.getElementById('keyboard-container');
+
+        // Раскладка клавиатуры (русская)
+        const layout = [
+            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+            ['Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З', 'Х', 'Ъ'],
+            ['Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж', 'Э'],
+            ['Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', '.', ','],
+            ['SPACE', 'BACKSPACE', 'ENTER']
+        ];
+
+        // Функция создания кнопок
+        layout.forEach(rowKeys => {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row';
+
+            rowKeys.forEach(key => {
+                const btn = document.createElement('button');
+                
+                // Настройка текста и классов для спецкнопок
+                if (key === 'SPACE') {
+                    btn.textContent = 'ПРОБЕЛ';
+                    btn.classList.add('btn-space');
+                    btn.onclick = () => addChar(' ');
+                } else if (key === 'BACKSPACE') {
+                    btn.textContent = '⌫'; // Значок стирания
+                    btn.classList.add('btn-wide');
+                    btn.onclick = () => deleteChar();
+                } else if (key === 'ENTER') {
+                    btn.textContent = '↵'; 
+                    btn.classList.add('btn-enter');
+                    btn.onclick = () => addChar('\n');
+                } else {
+                    btn.textContent = key;
+                    btn.onclick = () => addChar(key);
+                }
+
+                rowDiv.appendChild(btn);
+            });
+
+            keyboardContainer.appendChild(rowDiv);
+        });
+
+        // Логика печати
+        function addChar(char) {
+            output.value += char;
+            // Автопрокрутка вниз при печати
+            output.scrollTop = output.scrollHeight;
+            // Возврат фокуса в поле (чтобы курсор мигал)
+            output.focus();
+        }
+
+        function deleteChar() {
+            output.value = output.value.slice(0, -1);
+            output.focus();
+        }
+    </script>
+</body>
+</html>
