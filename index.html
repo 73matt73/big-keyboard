@@ -3,28 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Большая Клавиатура (Только буквы)</title>
+    <title>Большая Клавиатура</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: Arial, sans-serif;
         }
 
         body {
             display: flex;
             flex-direction: column;
-            height: 100vh; /* На весь экран */
+            height: 100vh;
             background-color: #f0f0f0;
-            overflow: hidden; /* Блокируем прокрутку страницы */
+            overflow: hidden;
         }
 
         /* Поле вывода текста */
         #output {
-            height: 25vh; /* Занимает 25% высоты экрана */
+            height: 25vh;
             width: 100%;
-            font-size: 45px; /* Очень крупный шрифт введенного текста */
+            font-size: 45px;
             padding: 20px;
             border: none;
             resize: none;
@@ -39,7 +39,7 @@
 
         /* Контейнер клавиатуры */
         .keyboard {
-            height: 75vh; /* Клавиатура занимает 75% высоты экрана */
+            height: 75vh;
             display: flex;
             flex-direction: column;
             background-color: #333;
@@ -48,7 +48,7 @@
 
         .row {
             display: flex;
-            flex: 1; /* Ряды растягиваются равномерно */
+            flex: 1;
             gap: 8px;
             margin-bottom: 8px;
         }
@@ -57,11 +57,13 @@
             margin-bottom: 0;
         }
 
-        /* Кнопки */
+        /* Кнопки (Обычные буквы) */
         button {
-            flex: 1; /* Кнопки растягиваются равномерно по ширине */
-            font-size: 55px; /* ОЧЕНЬ большие буквы */
-            font-weight: 900; /* Максимальная жирность */
+            flex: 1;
+            /* Шрифт стал еще больше */
+            font-size: 70px; 
+            /* Жирность убрана (теперь обычный текст) */
+            font-weight: normal; 
             background-color: #fff;
             border: 3px solid #000;
             border-radius: 10px;
@@ -69,7 +71,7 @@
             color: #000;
             padding: 0;
             touch-action: manipulation;
-            display: flex; /* Центрирование текста */
+            display: flex;
             align-items: center;
             justify-content: center;
         }
@@ -78,21 +80,27 @@
             background-color: #ccc;
         }
 
-        /* Специальные кнопки */
-        .btn-wide {
+        /* Спецкнопка: Стереть один символ */
+        .btn-backspace {
             flex: 1.5; 
-            background-color: #ffdddd; 
-            font-size: 40px; /* Чуть меньше для спецсимволов */
+            background-color: #ffeeb0; /* Желтоватый оттенок */
+            font-size: 50px;
         }
 
+        /* Спецкнопка: Пробел */
         .btn-space {
-            flex: 4; 
-            font-size: 30px;
+            flex: 3; 
+            font-size: 35px; /* Шрифт меньше, чтобы влезло слово */
+            font-weight: bold; /* Слово ПРОБЕЛ оставим чуть жирнее для читаемости */
         }
         
-        .btn-enter {
+        /* Спецкнопка: Очистить всё */
+        .btn-clear {
             flex: 1.5;
-            background-color: #ddffdd;
+            background-color: #ffcccc; /* Красный оттенок (опасно) */
+            font-size: 25px; /* Шрифт меньше, чтобы влезло слово */
+            font-weight: bold;
+            color: #330000;
         }
 
     </style>
@@ -108,15 +116,14 @@
         const output = document.getElementById('output');
         const keyboardContainer = document.getElementById('keyboard-container');
 
-        // Раскладка БЕЗ ЦИФР
+        // Раскладка
         const layout = [
             ['Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З', 'Х', 'Ъ'],
             ['Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж', 'Э'],
             ['Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', '.', ','],
-            ['SPACE', 'BACKSPACE', 'ENTER']
+            ['SPACE', 'BACKSPACE', 'CLEAR'] // Нижний ряд
         ];
 
-        // Функция создания кнопок
         layout.forEach(rowKeys => {
             const rowDiv = document.createElement('div');
             rowDiv.className = 'row';
@@ -129,13 +136,13 @@
                     btn.classList.add('btn-space');
                     btn.onclick = () => addChar(' ');
                 } else if (key === 'BACKSPACE') {
-                    btn.textContent = '⌫'; 
-                    btn.classList.add('btn-wide');
+                    btn.textContent = '⌫'; // Значок стирания одного символа
+                    btn.classList.add('btn-backspace');
                     btn.onclick = () => deleteChar();
-                } else if (key === 'ENTER') {
-                    btn.textContent = '↵'; 
-                    btn.classList.add('btn-enter');
-                    btn.onclick = () => addChar('\n');
+                } else if (key === 'CLEAR') {
+                    btn.textContent = 'СБРОС'; // Очистить всё
+                    btn.classList.add('btn-clear');
+                    btn.onclick = () => clearAll();
                 } else {
                     btn.textContent = key;
                     btn.onclick = () => addChar(key);
@@ -147,14 +154,25 @@
             keyboardContainer.appendChild(rowDiv);
         });
 
+        // Добавить символ
         function addChar(char) {
             output.value += char;
             output.scrollTop = output.scrollHeight;
             output.focus();
         }
 
+        // Стереть один символ
         function deleteChar() {
             output.value = output.value.slice(0, -1);
+            output.focus();
+        }
+
+        // Стереть ВЕСЬ текст
+        function clearAll() {
+            // Можно добавить подтверждение, если боитесь случайных нажатий:
+            // if(confirm('Точно стереть всё?')) { output.value = ''; }
+            
+            output.value = ''; // Стирает сразу
             output.focus();
         }
     </script>
