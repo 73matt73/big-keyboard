@@ -60,10 +60,8 @@
         /* Кнопки (Обычные буквы) */
         button {
             flex: 1;
-            /* Шрифт стал еще больше */
-            font-size: 70px; 
-            /* Жирность убрана (теперь обычный текст) */
-            font-weight: normal; 
+            font-size: 70px; /* Большой размер */
+            font-weight: normal; /* Тонкий шрифт */
             background-color: #fff;
             border: 3px solid #000;
             border-radius: 10px;
@@ -83,24 +81,33 @@
         /* Спецкнопка: Стереть один символ */
         .btn-backspace {
             flex: 1.5; 
-            background-color: #ffeeb0; /* Желтоватый оттенок */
+            background-color: #ffeeb0; 
             font-size: 50px;
         }
 
         /* Спецкнопка: Пробел */
         .btn-space {
             flex: 3; 
-            font-size: 35px; /* Шрифт меньше, чтобы влезло слово */
-            font-weight: bold; /* Слово ПРОБЕЛ оставим чуть жирнее для читаемости */
+            font-size: 30px;
+            font-weight: bold;
         }
         
         /* Спецкнопка: Очистить всё */
         .btn-clear {
-            flex: 1.5;
-            background-color: #ffcccc; /* Красный оттенок (опасно) */
-            font-size: 25px; /* Шрифт меньше, чтобы влезло слово */
+            flex: 1.2;
+            background-color: #ffcccc; 
+            font-size: 20px; 
             font-weight: bold;
             color: #330000;
+        }
+
+        /* Спецкнопка: Сохранить */
+        .btn-save {
+            flex: 1.2;
+            background-color: #cce5ff; /* Голубой */
+            font-size: 20px;
+            font-weight: bold;
+            color: #000033;
         }
 
     </style>
@@ -121,7 +128,7 @@
             ['Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З', 'Х', 'Ъ'],
             ['Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж', 'Э'],
             ['Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', '.', ','],
-            ['SPACE', 'BACKSPACE', 'CLEAR'] // Нижний ряд
+            ['SPACE', 'BACKSPACE', 'CLEAR', 'SAVE'] // Добавили SAVE
         ];
 
         layout.forEach(rowKeys => {
@@ -136,13 +143,17 @@
                     btn.classList.add('btn-space');
                     btn.onclick = () => addChar(' ');
                 } else if (key === 'BACKSPACE') {
-                    btn.textContent = '⌫'; // Значок стирания одного символа
+                    btn.textContent = '⌫';
                     btn.classList.add('btn-backspace');
                     btn.onclick = () => deleteChar();
                 } else if (key === 'CLEAR') {
-                    btn.textContent = 'СБРОС'; // Очистить всё
+                    btn.textContent = 'СБРОС';
                     btn.classList.add('btn-clear');
                     btn.onclick = () => clearAll();
+                } else if (key === 'SAVE') {
+                    btn.textContent = 'СКАЧАТЬ';
+                    btn.classList.add('btn-save');
+                    btn.onclick = () => saveToFile();
                 } else {
                     btn.textContent = key;
                     btn.onclick = () => addChar(key);
@@ -154,26 +165,37 @@
             keyboardContainer.appendChild(rowDiv);
         });
 
-        // Добавить символ
         function addChar(char) {
             output.value += char;
             output.scrollTop = output.scrollHeight;
             output.focus();
         }
 
-        // Стереть один символ
         function deleteChar() {
             output.value = output.value.slice(0, -1);
             output.focus();
         }
 
-        // Стереть ВЕСЬ текст
         function clearAll() {
-            // Можно добавить подтверждение, если боитесь случайных нажатий:
-            // if(confirm('Точно стереть всё?')) { output.value = ''; }
-            
-            output.value = ''; // Стирает сразу
+            output.value = '';
             output.focus();
+        }
+
+        // Функция сохранения в файл
+        function saveToFile() {
+            const textToSave = output.value;
+            // Создаем "виртуальный" файл
+            const blob = new Blob([textToSave], { type: "text/plain;charset=utf-8" });
+            
+            // Создаем временную ссылку для скачивания
+            const tempLink = document.createElement("a");
+            tempLink.href = URL.createObjectURL(blob);
+            tempLink.download = "zametka.txt"; // Имя файла
+            
+            // Нажимаем на ссылку программно
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
         }
     </script>
 </body>
