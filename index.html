@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Большая Клавиатура</title>
     <style>
         * {
@@ -17,20 +17,25 @@
             flex-direction: column;
             height: 100vh;
             background-color: #f0f0f0;
-            overflow: hidden;
+            overflow: hidden; /* Запрет прокрутки страницы */
+            overscroll-behavior: none; /* Запрет "пружинивания" на iPhone */
         }
 
         /* Поле вывода текста */
         #output {
             height: 25vh;
             width: 100%;
-            font-size: 100px;
+            font-size: 70px; /* Сделал чуть меньше 100px, чтобы влезало больше слов, но всё равно крупно */
             padding: 20px;
             border: none;
             resize: none;
+            border-bottom: 5px solid #333;
+            
+            /* ВАЖНО: Настройки для того, чтобы заблокированное поле выглядело как обычное */
             background-color: #ffffff;
             color: #000000;
-            border-bottom: 5px solid #333;
+            opacity: 1; 
+            -webkit-text-fill-color: #000000; /* Исправление для iPhone */
         }
 
         #output:focus {
@@ -60,15 +65,20 @@
         /* Кнопки (Обычные буквы) */
         button {
             flex: 1;
-            font-size: 70px; /* Большой размер */
-            font-weight: normal; /* Тонкий шрифт */
+            font-size: 70px;
+            font-weight: normal;
             background-color: #fff;
             border: 3px solid #000;
             border-radius: 10px;
             cursor: pointer;
             color: #000;
             padding: 0;
+            
+            /* Запрет выделения текста на кнопках */
+            -webkit-user-select: none;
+            user-select: none;
             touch-action: manipulation;
+            
             display: flex;
             align-items: center;
             justify-content: center;
@@ -104,7 +114,7 @@
         /* Спецкнопка: Сохранить */
         .btn-save {
             flex: 1.2;
-            background-color: #cce5ff; /* Голубой */
+            background-color: #cce5ff;
             font-size: 20px;
             font-weight: bold;
             color: #000033;
@@ -114,7 +124,7 @@
 </head>
 <body>
 
-    <textarea id="output" placeholder="..." autofocus></textarea>
+    <textarea id="output" placeholder="..." readonly="true"></textarea>
 
     <div class="keyboard" id="keyboard-container">
     </div>
@@ -128,7 +138,7 @@
             ['Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З', 'Х', 'Ъ'],
             ['Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж', 'Э'],
             ['Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', '.', ','],
-            ['SPACE', 'BACKSPACE', 'CLEAR', 'SAVE'] // Добавили SAVE
+            ['SPACE', 'BACKSPACE', 'CLEAR', 'SAVE']
         ];
 
         layout.forEach(rowKeys => {
@@ -159,6 +169,12 @@
                     btn.onclick = () => addChar(key);
                 }
 
+                // Добавляем обработку касания для мгновенной реакции на сенсоре
+                btn.addEventListener('touchend', (e) => {
+                    e.preventDefault(); 
+                    btn.click();
+                });
+
                 rowDiv.appendChild(btn);
             });
 
@@ -168,31 +184,22 @@
         function addChar(char) {
             output.value += char;
             output.scrollTop = output.scrollHeight;
-            output.focus();
         }
 
         function deleteChar() {
             output.value = output.value.slice(0, -1);
-            output.focus();
         }
 
         function clearAll() {
             output.value = '';
-            output.focus();
         }
 
-        // Функция сохранения в файл
         function saveToFile() {
             const textToSave = output.value;
-            // Создаем "виртуальный" файл
             const blob = new Blob([textToSave], { type: "text/plain;charset=utf-8" });
-            
-            // Создаем временную ссылку для скачивания
             const tempLink = document.createElement("a");
             tempLink.href = URL.createObjectURL(blob);
-            tempLink.download = "zametka.txt"; // Имя файла
-            
-            // Нажимаем на ссылку программно
+            tempLink.download = "zametka.txt";
             document.body.appendChild(tempLink);
             tempLink.click();
             document.body.removeChild(tempLink);
